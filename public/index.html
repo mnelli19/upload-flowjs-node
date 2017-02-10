@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Flow.js - Multiple simultaneous, stable and resumable uploads via the HTML5 File API</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css" />
+</head>
+
+<body>
+    <div class="container">
+
+        <h3>Upload with FlowJS</h3>
+
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1" id="messages">
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+                <form>
+                    <div class="form-group">
+                        <label for="user">Username*</label>
+                        <input type="text" name="username" class="form-control" id="user" placeholder="username">
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+                <div class="flow-error">
+                    Your browser, unfortunately, is not supported by Flow.js. The library requires support for <a href="http://www.w3.org/TR/FileAPI/">the HTML5 File API</a> along with <a href="http://www.w3.org/TR/FileAPI/#normalization-of-params">file slicing</a>.
+                </div>
+
+                <div class="flow-drop">
+                    <button id="uploadButton" class="btn btn-primary flow-browse" disabled>Upload File</button>
+                </div>
+
+                <h3>File List: </h3>
+                <div class="list-group"></div>
+            </div>
+        </div>
+
+    </div>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/jquery.loadTemplate.js"></script>
+    <script src="bootstrap/js/bootstrap.js"></script>
+    <script src="js/flow.js"></script>
+    <script src="js/app.js"></script>
+
+    <script type="text/html" id="template">
+        <div class="list-group-item" data-class="file">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" aria-valuemax="100">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <p>
+                        Uploading <span class="flow-file-name" data-content-text='flow-file-name'></span>
+                        <span class="flow-file-size label label-primary" data-content-text='flow-file-size'></span>
+                        <span class="flow-file-progress label label-default"></span>
+                        <a href="" class="flow-file-download" target="_blank" data-href='flow-file-download'> Download </a>
+
+                    </p>
+                    <button type="button" class="btn btn-success flow-file-resume btn-xs progress-resume-link" title="Resume upload">
+                        <span class="glyphicon glyphicon glyphicon-repeat" aria-hidden="true"></span>
+                    </button>
+                    <button type="button" class="btn btn-warning flow-file-pause btn-xs progress-pause-link" title="Pause upload">
+                        <span class="glyphicon glyphicon glyphicon-pause" aria-hidden="true"></span>
+                    </button>
+                    <button type="button" class="btn btn-danger flow-file-cancel btn-xs progress-cancel-link" title="Cancel upload">
+                        <span class="glyphicon glyphicon glyphicon-remove" aria-hidden="true"></span>
+                    </button>
+
+                </div>
+            </div>
+
+
+
+        </div>
+    </script>
+
+    <script type="text/html" id="alert-template">
+        <div class="alert alert-warning alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span></button>
+            <strong>Warning!</strong> E' stato gia' eseguito l'upload per questo file.
+        </div>
+    </script>
+
+</body>
+
+</html>
