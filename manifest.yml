@@ -1,1 +1,4 @@
-
+---
+applications:
+- name:    upload-flowjs-node
+  command: node my-app.js
