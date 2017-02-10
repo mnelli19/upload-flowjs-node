@@ -1,5 +1,5 @@
 ---
 applications:
 - name:    upload-flowjs-node
-  command: node app.js
+  command: node server.js
   
