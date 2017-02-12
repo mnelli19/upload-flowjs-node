@@ -26,7 +26,7 @@ let upload = (uploadedDir) => {
 
     const UPLOADED_DIR = uploadedDir;
     
-    let writeChunk = (filename, buffer, position, callback) => {
+    let writeChunk = (filename, file, position, callback) => {
         /* 
         let writer = fs.createWriteStream(filename, {
             flags: 'r+',
@@ -63,7 +63,7 @@ let upload = (uploadedDir) => {
     });
     
     // TO-DO - creare un readable stream con il buffer
-    var myFile = fs.createReadStream(filename, {
+    var myFile = fs.createReadStream(file.originalname, {
             start: position
         });
     
@@ -71,7 +71,7 @@ let upload = (uploadedDir) => {
 
         var uploadstorage = storageClient.upload({
             container: "FlowJsNode",
-            remote: filename+"-"+position
+            remote: file.originalname+"-"+position
         });
 
         uploadstorage.on('error', function(err) {
@@ -100,12 +100,12 @@ let upload = (uploadedDir) => {
 
         if (fs.existsSync(uploadDir)) {
             console.log(">>>>>fs.exist");
-            writeChunk(uploadDir, file.buffer, position, callback);
+            writeChunk(uploadDir, file, position, callback);
 
         } else {
             var buffer = new Buffer(0);
             fs.outputFile(uploadDir, buffer, function() {
-                writeChunk(uploadDir, file.buffer, position, callback);
+                writeChunk(uploadDir, file, position, callback);
             });
         }
     }
