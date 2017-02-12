@@ -62,7 +62,7 @@ let upload = (uploadedDir) => {
         
     });
     
-    var myFile = fs.createReadStream(filename {
+    var myFile = fs.createReadStream(filename, {
             start: position
         });
 
