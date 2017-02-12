@@ -6,13 +6,14 @@ fs.open = require('fs').open;
 fs.write = require('fs').write;
 
 const path = require('path');
+var pkgcloud = require('pkgcloud');
 
 let upload = (uploadedDir) => {
 
     const UPLOADED_DIR = uploadedDir
 
     //bluemix file storage modificato
-var pkgcloud = require('pkgcloud');
+
 
 var config = {
     provider: 'openstack',
@@ -68,24 +69,24 @@ var config = {
             start: position
         });
 
-        var upload = storageClient.upload({
+        var uploadstorage = storageClient.upload({
             container: "FlowJsNode",
             remote: filename+"-"+position
         });
 
-        upload.on('error', function(err) {
+        uploadstorage.on('error', function(err) {
             console.log("**** ERROR >>>> ");
             console.error(err);
             callback(err);
         });
 
-        upload.on('success', function(file) {
+        uploadstorage.on('success', function(file) {
             console.log("**** SUCCESS >>>> ");
             console.log(file.toJSON());
             callback();
         });
 
-        myFile.pipe(upload);
+        myFile.pipe(uploadstorage);
         
        
     }
