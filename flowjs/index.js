@@ -103,7 +103,6 @@ let upload = (uploadedDir) => {
         } else {
             var buffer = new Buffer(0);
             fs.outputFile(uploadDir, buffer, function() {
-                console.log(">>>>>outputFile);
                 writeChunk(uploadDir, file.buffer, position, callback);
             });
         }
