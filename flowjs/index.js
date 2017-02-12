@@ -24,7 +24,7 @@ var config = {
 
 let upload = (uploadedDir) => {
 
-    const UPLOADED_DIR = uploadedDi;
+    const UPLOADED_DIR = uploadedDir;
     
     let writeChunk = (filename, buffer, position, callback) => {
         /* 
