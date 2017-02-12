@@ -39,6 +39,7 @@ app.post('/upload', upload.single('file'), (req, res) => {
     let body = req.body;
 
     //modifica bluemix ///
+    console.log("**** >>>> "+req);
     var storageClient = pkgcloud.storage.createClient(config);
 
     storageClient.auth(function(err) {
