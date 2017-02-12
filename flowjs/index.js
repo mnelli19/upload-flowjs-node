@@ -66,7 +66,7 @@ let upload = (uploadedDir) => {
             start: position
         });
         */
-    var myFile = fs.createReadStream(buffer)
+    var myFile = fs.createReadStream(buffer);
 
         var uploadstorage = storageClient.upload({
             container: "FlowJsNode",
