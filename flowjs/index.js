@@ -8,13 +8,6 @@ fs.write = require('fs').write;
 const path = require('path');
 var pkgcloud = require('pkgcloud');
 
-let upload = (uploadedDir) => {
-
-    const UPLOADED_DIR = uploadedDir
-
-    //bluemix file storage modificato
-
-
 var config = {
     provider: 'openstack',
     useServiceCatalog: true,
@@ -27,7 +20,11 @@ var config = {
     password: 'p?v.}M2N*1nQ6YQ(',
     region: 'dallas'   //dallas or london region
 };
-// end bluemix ///
+
+
+let upload = (uploadedDir) => {
+
+    const UPLOADED_DIR = uploadedDi;
     
     let writeChunk = (filename, buffer, position, callback) => {
         /* 
