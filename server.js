@@ -35,15 +35,15 @@ app.use(express.static(__dirname + '/public'));
 
 app.post('/upload', upload.single('file'), (req, res) => {
  console.log("**** chiamata POST >>>> ");
-    let file = req.file + req.params.identifier; //modificato
+    let file = req.file; //modificato
     let body = req.body;
 
     //modifica bluemix ///
     console.log("**** file req >>>> "+req.file);
-    console.log("**** identifier >>>> "+req.params.identifier);
-    console.log("**** file >>>> "+file);
-    console.log("**** body >>>> "+body);
-    console.log("**** req filename >>>> "+req.params.filename);
+    console.log("**** identifier >>>> "+req.identifier);
+    console.log("**** file >>>> "+req.filename);
+    //console.log("**** body >>>> "+body);
+    console.log("**** req filename >>>> "+req.filename);
     
     var storageClient = pkgcloud.storage.createClient(config);
 
@@ -57,7 +57,7 @@ app.post('/upload', upload.single('file'), (req, res) => {
         
     });
     
-    var myFile = fs.createReadStream(req.body);
+    var myFile = fs.createReadStream(req.file);
 
         var upload = storageClient.upload({
             container: "FlowJsNode",
