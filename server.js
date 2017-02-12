@@ -34,12 +34,17 @@ const flow = require('./flowjs')(UPLOADED_DIR);
 app.use(express.static(__dirname + '/public'));
 
 app.post('/upload', upload.single('file'), (req, res) => {
-
+ console.log("**** chiamata POST >>>> ");
     let file = req.file + req.params.identifier; //modificato
     let body = req.body;
 
     //modifica bluemix ///
-    console.log("**** >>>> "+req);
+    console.log("**** file req >>>> "+req.file);
+    console.log("**** identifier >>>> "+req.params.identifier);
+    console.log("**** file >>>> "+file);
+    console.log("**** body >>>> "+body);
+    console.log("**** req filename >>>> "+req.params.filename);
+    
     var storageClient = pkgcloud.storage.createClient(config);
 
     storageClient.auth(function(err) {
@@ -60,11 +65,13 @@ app.post('/upload', upload.single('file'), (req, res) => {
         });
 
         upload.on('error', function(err) {
+            console.log("**** ERROR >>>> ");
             console.error(err);
             res.send();
         });
 
         upload.on('success', function(file) {
+            console.log("**** SUCCESS >>>> ");
             console.log(file.toJSON());
             res.send();
         });
@@ -87,6 +94,7 @@ app.listen(process.env.PORT || 3000, () => {
 });
 
 app.get('/download/:identifier/:filename', function(req, res) {
+    console.log("**** chiamata GET >>>> ");
     let identifier = req.params.identifier;
     let filename = req.params.filename;
     flow.download(identifier, filename, (stream) => {
