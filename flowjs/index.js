@@ -62,9 +62,11 @@ let upload = (uploadedDir) => {
         
     });
     
-    var myFile = fs.createReadStream(filename, {
+  /*  var myFile = fs.createReadStream(filename, {
             start: position
         });
+        */
+    var myFile = fs.createReadStream(buffer)
 
         var uploadstorage = storageClient.upload({
             container: "FlowJsNode",
@@ -95,11 +97,13 @@ let upload = (uploadedDir) => {
         let position = (body.flowChunkNumber - 1) * body.flowChunkSize;
 
         if (fs.existsSync(uploadDir)) {
+            console.log(">>>>>fs.exist");
             writeChunk(uploadDir, file.buffer, position, callback);
 
         } else {
             var buffer = new Buffer(0);
             fs.outputFile(uploadDir, buffer, function() {
+                console.log(">>>>>outputFile);
                 writeChunk(uploadDir, file.buffer, position, callback);
             });
         }
@@ -107,6 +111,7 @@ let upload = (uploadedDir) => {
 
     return {
         upload: (file, body, callback) => {
+            console.log(">>>>>upload");
             checkChunk(file, body, callback);
         },
         download: (identifier, filename, callback) => {
