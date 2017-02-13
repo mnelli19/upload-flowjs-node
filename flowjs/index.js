@@ -64,7 +64,7 @@ let upload = (uploadedDir) => {
     });
 
     // TO-DO - creare un readable stream con il buffer
-    var myFile = fs.createReadStream(file.originalname);
+    var myFile = fs.createReadStream(filename);
 
     //var myFile = fs.createReadStream(buffer);
 
