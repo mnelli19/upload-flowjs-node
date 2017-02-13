@@ -46,7 +46,7 @@ let upload = (uploadedDir) => {
 
     //modifica bluemix ///
     console.log("**** filename >>>> "+filename);
-    console.log("**** buffer >>>> "+buffer);
+    //console.log("**** buffer >>>> "+buffer);
     console.log("**** position >>>> "+position);
     console.log("**** chuknksize >>>>"+chunkSize);
 
@@ -112,6 +112,7 @@ let upload = (uploadedDir) => {
         .then(function(files){
           console.log('list of files in container:', files);
         });
+        
  }
     let checkChunk = (file, body, callback) => {
 
