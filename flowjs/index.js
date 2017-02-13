@@ -6,9 +6,9 @@ fs.open = require('fs').open;
 fs.write = require('fs').write;
 
 const path = require('path');
-var pkgcloud = require('pkgcloud');
-
-var config = {
+//var pkgcloud = require('pkgcloud');
+var ObjectStorage = require('bluemix-object-storage');
+/*var config = {
     provider: 'openstack',
     useServiceCatalog: true,
     useInternal: false,
@@ -19,15 +19,14 @@ var config = {
     username: 'admin_9757dce54df22d39aebe60045e8949690d5ad7fe',
     password: 'p?v.}M2N*1nQ6YQ(',
     region: 'dallas'   //dallas or london region
-};
-
+};*/
 
 let upload = (uploadedDir) => {
 
-    const UPLOADED_DIR = uploadedDir;
-    
-    let writeChunk = (filename, file, position, callback) => {
-        /* 
+    const UPLOADED_DIR = uploadedDir
+
+    let writeChunk = (filename, buffer, position, chunkSize, callback) => {
+        /*
         let writer = fs.createWriteStream(filename, {
             flags: 'r+',
             autoClose: true,
@@ -43,14 +42,15 @@ let upload = (uploadedDir) => {
             callback(err);
         });
         */
-        
-        
+
+
     //modifica bluemix ///
     console.log("**** filename >>>> "+filename);
     console.log("**** buffer >>>> "+buffer);
     console.log("**** position >>>> "+position);
-    
-    var storageClient = pkgcloud.storage.createClient(config);
+    console.log("**** chuknksize >>>>"+chunkSize);
+
+    /*var storageClient = pkgcloud.storage.createClient(config);
 
     storageClient.auth(function(err) {
         if (err) {
@@ -59,14 +59,14 @@ let upload = (uploadedDir) => {
         else {
             console.log(storageClient._identity);
         }
-        
+
     });
-    
+
     // TO-DO - creare un readable stream con il buffer
     var myFile = fs.createReadStream(file.originalname, {
             start: position
         });
-    
+
     //var myFile = fs.createReadStream(buffer);
 
         var uploadstorage = storageClient.upload({
@@ -87,32 +87,53 @@ let upload = (uploadedDir) => {
         });
 
         myFile.pipe(uploadstorage);
-        
-       
-    }
+
+
+    } */
+
+    var os = new ObjectStorage(
+      'admin_9757dce54df22d39aebe60045e8949690d5ad7fe',
+      'p?v.}M2N*1nQ6YQ(',
+      '80e33159813f48739f09570464e566c4',
+      'FlowJsNode',
+      'https://identity.open.softlayer.com');
+
+        os.createContainer()
+        .then(function(){
+          return os.setContainerPublicReadable();
+        })
+        .then(function(){
+          return os.uploadFileToContainer(filename, 'image/jpeg', buffer, chunkSize);
+        })
+        .then(function(file){
+          console.log('url to uploaded file:', file);
+          return os.listContainerFiles();
+        })
+        .then(function(files){
+          console.log('list of files in container:', files);
+        });
 
     let checkChunk = (file, body, callback) => {
 
         let filename = body.flowFilename;
-        let uploadDir = path.join(body.flowIdentifier, filename);
-       // let uploadDir = path.join(UPLOADED_DIR, body.flowIdentifier, filename);
+        let uploadDir = path.join(UPLOADED_DIR, body.flowIdentifier, filename);
         let position = (body.flowChunkNumber - 1) * body.flowChunkSize;
+        let chunkSize = body.flowChunkSize;
+
 
         if (fs.existsSync(uploadDir)) {
-            console.log(">>>>>fs.exist");
-            writeChunk(uploadDir, file, position, callback);
+            writeChunk(uploadDir, file.buffer, position,chunkSize, callback);
 
         } else {
             var buffer = new Buffer(0);
             fs.outputFile(uploadDir, buffer, function() {
-                writeChunk(uploadDir, file, position, callback);
+                writeChunk(uploadDir, file.buffer, position,chunkSize, callback);
             });
         }
     }
 
     return {
         upload: (file, body, callback) => {
-            console.log(">>>>>upload");
             checkChunk(file, body, callback);
         },
         download: (identifier, filename, callback) => {
