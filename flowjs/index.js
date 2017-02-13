@@ -89,7 +89,7 @@ let upload = (uploadedDir) => {
         myFile.pipe(uploadstorage);
 
 
-    } */
+    */
 
     var os = new ObjectStorage(
       'admin_9757dce54df22d39aebe60045e8949690d5ad7fe',
@@ -112,7 +112,7 @@ let upload = (uploadedDir) => {
         .then(function(files){
           console.log('list of files in container:', files);
         });
-
+ }
     let checkChunk = (file, body, callback) => {
 
         let filename = body.flowFilename;
