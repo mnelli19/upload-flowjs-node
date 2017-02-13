@@ -26,6 +26,7 @@ let upload = (uploadedDir) => {
     const UPLOADED_DIR = uploadedDir
 
     let writeChunk = (filename, file, position, chunkSize, callback) => {
+    	console.log("**** writeChunk >>>> ");
         /*
         let writer = fs.createWriteStream(filename, {
             flags: 'r+',
@@ -113,7 +114,7 @@ let upload = (uploadedDir) => {
         
  }
     let checkChunk = (file, body, callback) => {
-
+    	console.log("**** chechChunk >>>> ");
         let filename = body.flowFilename;
         let uploadDir = path.join(UPLOADED_DIR, body.flowIdentifier, filename);
         let position = (body.flowChunkNumber - 1) * body.flowChunkSize;
