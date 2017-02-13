@@ -55,9 +55,11 @@ let upload = (uploadedDir) => {
 
     storageClient.auth(function(err) {
         if (err) {
+        	console.log("**** error auth object storage >>>> ");
             console.error(err);
         }
         else {
+        	console.log("**** ok auth object storage >>>> ");
             console.log(storageClient._identity);
         }
 
