@@ -6,8 +6,8 @@ fs.open = require('fs').open;
 fs.write = require('fs').write;
 
 const path = require('path');
-//var pkgcloud = require('pkgcloud');
-var ObjectStorage = require('bluemix-object-storage');
+var pkgcloud = require('pkgcloud');
+//var ObjectStorage = require('bluemix-object-storage');
 var config = {
     provider: 'openstack',
     useServiceCatalog: true,
