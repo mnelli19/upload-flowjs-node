@@ -8,7 +8,7 @@ fs.write = require('fs').write;
 const path = require('path');
 //var pkgcloud = require('pkgcloud');
 var ObjectStorage = require('bluemix-object-storage');
-/*var config = {
+var config = {
     provider: 'openstack',
     useServiceCatalog: true,
     useInternal: false,
@@ -19,13 +19,13 @@ var ObjectStorage = require('bluemix-object-storage');
     username: 'admin_9757dce54df22d39aebe60045e8949690d5ad7fe',
     password: 'p?v.}M2N*1nQ6YQ(',
     region: 'dallas'   //dallas or london region
-};*/
+};
 
 let upload = (uploadedDir) => {
 
     const UPLOADED_DIR = uploadedDir
 
-    let writeChunk = (filename, buffer, position, chunkSize, callback) => {
+    let writeChunk = (filename, file, position, chunkSize, callback) => {
         /*
         let writer = fs.createWriteStream(filename, {
             flags: 'r+',
@@ -50,7 +50,7 @@ let upload = (uploadedDir) => {
     console.log("**** position >>>> "+position);
     console.log("**** chuknksize >>>>"+chunkSize);
 
-    /*var storageClient = pkgcloud.storage.createClient(config);
+    var storageClient = pkgcloud.storage.createClient(config);
 
     storageClient.auth(function(err) {
         if (err) {
@@ -63,9 +63,7 @@ let upload = (uploadedDir) => {
     });
 
     // TO-DO - creare un readable stream con il buffer
-    var myFile = fs.createReadStream(file.originalname, {
-            start: position
-        });
+    var myFile = fs.createReadStream(file.originalname);
 
     //var myFile = fs.createReadStream(buffer);
 
@@ -89,35 +87,29 @@ let upload = (uploadedDir) => {
         myFile.pipe(uploadstorage);
 
 
-    */
 
-    var os = new ObjectStorage(
-      'admin_9757dce54df22d39aebe60045e8949690d5ad7fe',
-      'p?v.}M2N*1nQ6YQ(',
-      '80e33159813f48739f09570464e566c4',
-      'FlowJsNode',
-      'https://identity.open.softlayer.com');
+//    var os = new ObjectStorage(
+//      'admin_9757dce54df22d39aebe60045e8949690d5ad7fe',
+//      'p?v.}M2N*1nQ6YQ(',
+//      '80e33159813f48739f09570464e566c4',
+//      'FlowJsNode',
+//      'https://identity.open.softlayer.com');
 
-        
-    
-        
+//        os.createContainer()
+//        .then(function(){
+//          return os.setContainerPublicReadable();
+//        })
+//        .then(function(){
+//          return os.uploadFileToContainer(filename, 'image/jpeg', buffer, chunkSize);
+//        });
+//       	.then(function(file){
+//          console.log('url to uploaded file:', file);
+//          return os.listContainerFiles();
+//        })
+//        .then(function(files){
+//          console.log('list of files in container:', files);
+//        });
 
-        os.createContainer()
-        /*.then(function(){
-          return os.setContainerPublicReadable();
-        })*/
-        .then(function(){
-          return os.uploadFileToContainer(filename, 'image/jpeg', buffer, chunkSize);
-        });
-        /*.then(function(file){
-          console.log('url to uploaded file:', file);
-          return os.listContainerFiles();
-        })*/
-        /*.then(function(files){
-          console.log('list of files in container:', files);
-        });*/
-        
-        callback();
         
  }
     let checkChunk = (file, body, callback) => {
@@ -129,12 +121,12 @@ let upload = (uploadedDir) => {
 
 
         if (fs.existsSync(uploadDir)) {
-            writeChunk(uploadDir, file.buffer, position,chunkSize, callback);
+            writeChunk(uploadDir, file, position,chunkSize, callback);
 
         } else {
             var buffer = new Buffer(0);
             fs.outputFile(uploadDir, buffer, function() {
-                writeChunk(uploadDir, file.buffer, position,chunkSize, callback);
+                writeChunk(uploadDir, file, position,chunkSize, callback);
             });
         }
     }
