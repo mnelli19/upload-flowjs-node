@@ -98,7 +98,21 @@ let upload = (uploadedDir) => {
       'FlowJsNode',
       'https://identity.open.softlayer.com');
 
-        os.createContainer()
+    var uploadstorage = os.uploadFileToContainer(filename, 'image/jpeg', buffer, chunkSize);
+
+uploadstorage.on('error', function(err) {
+    console.log("**** ERROR >>>> ");
+    console.error(err);
+    callback(err);
+});
+
+uploadstorage.on('success', function(file) {
+    console.log("**** SUCCESS >>>> ");
+    console.log(file.toJSON());
+    callback();
+});
+
+        /*os.createContainer()
         .then(function(){
           return os.setContainerPublicReadable();
         })
@@ -112,6 +126,7 @@ let upload = (uploadedDir) => {
         .then(function(files){
           console.log('list of files in container:', files);
         });
+*/
         
  }
     let checkChunk = (file, body, callback) => {
