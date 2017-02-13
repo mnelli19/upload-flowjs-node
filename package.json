@@ -3,7 +3,6 @@
     "express": "^4.14.0",
     "fs-extra": "^1.0.0",
     "pkgcloud": "^1.4.0",
-    "bluemix-object-storage":"^2.0.1",
     "multer": "^1.2.1"
   },
   "main": "server.js",

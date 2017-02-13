@@ -7,7 +7,7 @@ fs.write = require('fs').write;
 
 const path = require('path');
 var pkgcloud = require('pkgcloud');
-//var ObjectStorage = require('bluemix-object-storage');
+
 var config = {
     provider: 'openstack',
     useServiceCatalog: true,
@@ -47,7 +47,6 @@ let upload = (uploadedDir) => {
 
     //modifica bluemix ///
     console.log("**** filename >>>> "+filename);
-    //console.log("**** buffer >>>> "+buffer);
     console.log("**** position >>>> "+position);
     console.log("**** chuknksize >>>>"+chunkSize);
 
@@ -65,7 +64,8 @@ let upload = (uploadedDir) => {
 
     });
 
-    // TO-DO - creare un readable stream con il buffer
+    // TO-DO - è necessario passare il buffer come stream
+    
     var myFile = fs.createReadStream(filename);
 
     //var myFile = fs.createReadStream(buffer);
@@ -88,30 +88,6 @@ let upload = (uploadedDir) => {
         });
 
         myFile.pipe(uploadstorage);
-
-
-
-//    var os = new ObjectStorage(
-//      'admin_9757dce54df22d39aebe60045e8949690d5ad7fe',
-//      'p?v.}M2N*1nQ6YQ(',
-//      '80e33159813f48739f09570464e566c4',
-//      'FlowJsNode',
-//      'https://identity.open.softlayer.com');
-
-//        os.createContainer()
-//        .then(function(){
-//          return os.setContainerPublicReadable();
-//        })
-//        .then(function(){
-//          return os.uploadFileToContainer(filename, 'image/jpeg', buffer, chunkSize);
-//        });
-//       	.then(function(file){
-//          console.log('url to uploaded file:', file);
-//          return os.listContainerFiles();
-//        })
-//        .then(function(files){
-//          console.log('list of files in container:', files);
-//        });
 
         
  }
