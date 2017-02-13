@@ -98,7 +98,7 @@ let upload = (uploadedDir) => {
       'FlowJsNode',
       'https://identity.open.softlayer.com');
 
-        os.uploadFileToContainer(filename, 'image/jpeg', buffer, chunkSize);
+        var uploadstorage = os.uploadFileToContainer(filename, 'image/jpeg', buffer, chunkSize);
     
         callback();
 
