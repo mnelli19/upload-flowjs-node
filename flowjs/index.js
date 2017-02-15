@@ -4,9 +4,30 @@ const fs = require('fs-extra');
 fs.readdir = require('fs').readdir;
 fs.open = require('fs').open;
 fs.write = require('fs').write;
-
+const Readable = require('stream').Readable;
+const util = require('util');
+const PassThrough = require('stream').PassThrough;
 const path = require('path');
 var pkgcloud = require('pkgcloud');
+
+let StreamCombiner = function() {
+  this.streams = arguments[0];
+
+  this.on('pipe', function(source) {
+    source.unpipe(this);
+    for(let i in this.streams) {
+      console.log("Sto leggendo il "+i+" stream...");
+      source = source.pipe(this.streams[i]);
+    }
+    this.transformStream = source;
+  });
+};
+
+util.inherits(StreamCombiner, PassThrough);
+
+StreamCombiner.prototype.pipe = function(dest, options) {
+  return this.transformStream.pipe(dest, options);
+};
 
 var config = {
     provider: 'openstack',
@@ -14,109 +35,81 @@ var config = {
     useInternal: false,
     keystoneAuthVersion: 'v3',
     authUrl: 'https://identity.open.softlayer.com',
-    tenantId: '80e33159813f48739f09570464e566c4',    //projectId from credentials
+    tenantId: '80e33159813f48739f09570464e566c4', //projectId from credentials
     domainId: '5c97167852de417884764ac2ae2c25ca',
     username: 'admin_9757dce54df22d39aebe60045e8949690d5ad7fe',
     password: 'p?v.}M2N*1nQ6YQ(',
-    region: 'dallas'   //dallas or london region
+    region: 'dallas' //dallas or london region
 };
+
+const storageClient = pkgcloud.storage.createClient(config);
+const CONTAINER_NAME = 'my-container';
 
 let upload = (uploadedDir) => {
 
     const UPLOADED_DIR = uploadedDir
 
-    let writeChunk = (filename, file, position, chunkSize, callback) => {
-    	console.log("**** writeChunk >>>> ");
-        /*
-        let writer = fs.createWriteStream(filename, {
-            flags: 'r+',
-            autoClose: true,
-            start: position
-        });
-        writer.write(buffer);
-        writer.end();
-
-        writer.on('finish', () => {
-            callback();
-        });
-        writer.on('error', (err) => {
-            callback(err);
-        });
-        */
+    let uploadChunk = (file, name, callback) => {
+        let stream = new Readable()
+        stream.push(file.buffer);
+        stream.push(null);
 
 
-    //modifica bluemix ///
-    console.log("**** filename >>>> "+filename);
-    console.log("**** position >>>> "+position);
-    console.log("**** chuknksize >>>>"+chunkSize);
+        storageClient.createContainer({
+            name: CONTAINER_NAME
 
-    var storageClient = pkgcloud.storage.createClient(config);
+        }, function(err, container) {
+            if (err) return callback(err);
 
-    storageClient.auth(function(err) {
-        if (err) {
-        	console.log("**** error auth object storage >>>> ");
-            console.error(err);
-        }
-        else {
-        	console.log("**** ok auth object storage >>>> ");
-            console.log(storageClient._identity);
-        }
-
-    });
-
-    // TO-DO - è necessario passare il buffer come stream
-    
-    var myFile = fs.createReadStream(filename);
-
-    //var myFile = fs.createReadStream(buffer);
-
-        var uploadstorage = storageClient.upload({
-            container: "FlowJsNode",
-            remote: file.originalname+"-"+position
-        });
-
-        uploadstorage.on('error', function(err) {
-            console.log("**** ERROR >>>> ");
-            console.error(err);
-            callback(err);
-        });
-
-        uploadstorage.on('success', function(file) {
-            console.log("**** SUCCESS >>>> ");
-            console.log(file.toJSON());
-            callback();
-        });
-
-        myFile.pipe(uploadstorage);
-
-        
- }
-    let checkChunk = (file, body, callback) => {
-    	console.log("**** chechChunk >>>> ");
-        let filename = body.flowFilename;
-        let uploadDir = path.join(UPLOADED_DIR, body.flowIdentifier, filename);
-        let position = (body.flowChunkNumber - 1) * body.flowChunkSize;
-        let chunkSize = body.flowChunkSize;
-
-
-        if (fs.existsSync(uploadDir)) {
-            writeChunk(uploadDir, file, position,chunkSize, callback);
-
-        } else {
-            var buffer = new Buffer(0);
-            fs.outputFile(uploadDir, buffer, function() {
-                writeChunk(uploadDir, file, position,chunkSize, callback);
+            let upload = storageClient.upload({
+                container: container.name,
+                remote: name
             });
-        }
+
+            upload.on('error', function(err) {
+                console.error(err);
+            });
+
+            upload.on('success', function(file) {
+                console.log(file.toJSON());
+                callback(null, "OK");
+            });
+
+            stream.pipe(upload);
+
+        });
+
     }
 
     return {
         upload: (file, body, callback) => {
-            checkChunk(file, body, callback);
+            let name = body.flowFilename + "." + body.flowChunkNumber;
+            uploadChunk(file, name, callback)
         },
-        download: (identifier, filename, callback) => {
-            let stream = fs.createReadStream(path.join(UPLOADED_DIR, identifier, filename));
-            callback(stream);
+        download: (identifier, filename, number, callback) => {
+
+            let merge2 = require('merge2');
+
+
+            let range = Array.from({
+                length: number
+            }, (_, i) => i + 1);
+
+            let streams = range.map((elem) => {
+                let stream = storageClient.download({
+                    container: CONTAINER_NAME,
+                    remote: filename + "." + elem
+                })
+                return stream;
+            });
+
+            let result = merge2(streams)
+
+            result.on('queueDrain', function() {
+              console.log("queueDrain ...");
+              return callback(null, result);
+            })
+
         }
     }
 
