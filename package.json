@@ -2,8 +2,11 @@
   "dependencies": {
     "express": "^4.14.0",
     "fs-extra": "^1.0.0",
-    "pkgcloud": "^1.4.0",
-    "multer": "^1.2.1"
+    "merge-stream": "^1.0.1",
+    "merge2": "^1.0.3",
+    "multer": "^1.2.1",
+    "multistream": "^2.1.0",
+    "pkgcloud": "^1.4.0"
   },
   "main": "server.js",
   "scripts": {
