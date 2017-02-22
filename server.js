@@ -1,46 +1,83 @@
 'use strict';
 
-const UPLOADED_DIR = "uploaded/";
-
 const express = require('express');
-const app = express();
 const multer = require('multer');
-
-let storage = multer.memoryStorage();
+const CombinedStream = require('combined-stream');
+const bodyParser = require('body-parser');
+const flow = require('./lib/flowjs')();
+const request = require('./lib/request');
+const MAX_DATA_SIZE = 2 * 1024 * 1024 * 1024;
 
 const upload = multer({
-    storage: storage
+    storage: multer.memoryStorage()
 });
-const flow = require('./flowjs')(UPLOADED_DIR);
 
+const app = express();
+
+app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
 
+app.post('/prepare', (req, res) => {
+    let body = req.body;
+    request.insert(body, (err, body) => {
+        if (err) return res.status(err.code).json({message: err.msg}).end();
+
+        res.status(200).json({
+            message: body.msg
+        }).end();
+    })
+});
+
 app.post('/upload', upload.single('file'), (req, res) => {
- console.log("**** chiamata POST >>>> ");
     let file = req.file;
     let body = req.body;
 
     flow.upload(file, body, (err, result) => {
+        if(err) res.status(500).end();
         res.send();
     });
+});
 
+app.put('/confirm', (req, res) => {
+    let body = req.body;
+    let uniqueIdentifier = body.identifier;
+    let user = body.user;
+    request.confirm(uniqueIdentifier, user, (err, body) => {
+        if (err) return res.status(err.code).json({message: err.msg}).end();
+
+        res.status(200).json({
+            message: body.msg
+        }).end();
+    })
+});
+
+app.get('/download/:identifier/user/:user', function(req, res) {
+    let identifier = req.params.identifier;
+    let user = req.params.user;
+
+    request.getFromIdAndUser(identifier, user, (err, body) => {
+        if (err) res.status(err.code).json(err.msg).end();
+
+        let filename = body.docs[0].name;
+        let size = body.docs[0].size;
+        flow.download(identifier, filename, size, (err, streams) => {
+
+            res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+            res.setHeader('Content-type', 'application/octet-stream');
+
+            let combinedStream = CombinedStream.create({
+                maxDataSize: MAX_DATA_SIZE
+            });
+
+            for (let stream of streams) {
+                combinedStream.append(stream);
+            }
+            combinedStream.pipe(res);
+        });
+    })
 
 });
 
 app.listen(process.env.PORT || 3000, () => {
     console.log('App listening on port 3000!')
-});
-
-app.get('/download/:identifier/:filename/:number', function(req, res) {
-    console.log("**** chiamata GET >>>> ");
-    let identifier = req.params.identifier;
-    let filename = req.params.filename;
-    let number = req.params.number;
-    flow.download(identifier, filename, number, (err, result) => {
-
-        res.setHeader('Content-disposition', 'attachment; filename=' + filename);
-        res.setHeader('Content-type', 'application/octet-stream');
-        result.pipe(res);
-
-    });
 });
