@@ -1,54 +1,102 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <title>Flow.js - Multiple simultaneous, stable and resumable uploads via the HTML5 File API</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" type="text/css" href="css/style.css" />
-  </head>
-  <body>
-    <div id="frame">
+    <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css" />
+</head>
 
-      <h1>Flow.js</h1>
-      <p>It's a JavaScript library providing multiple simultaneous, stable and resumable uploads via the HTML5 File API.</p>
+<body>
+    <div class="container">
 
-      <p>The library is designed to introduce fault-tolerance into the upload of large files through HTTP. This is done by splitting each files into small chunks; whenever the upload of a chunk fails, uploading is retried until the procedure completes. This allows uploads to automatically resume uploading after a network connection is lost either locally or to the server. Additionally, it allows for users to pause and resume uploads without loosing state.</p>
+        <h3>Upload with FlowJS</h3>
 
-      <p>Flow.js relies on the HTML5 File API and the ability to chunks files into smaller pieces. Currently, this means that support is limited to Firefox 4+ and Chrome 11+.</p>
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1" id="messages">
 
-      <hr/>
+            </div>
+        </div>
 
-      <h3>Demo</h3>
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+                <form>
+                    <div class="form-group">
+                        <label for="user">Username*</label>
+                        <input type="text" name="username" class="form-control" id="user" placeholder="username">
+                    </div>
+                </form>
+            </div>
+        </div>
 
-      <div class="flow-error">
-        Your browser, unfortunately, is not supported by Flow.js. The library requires support for <a href="http://www.w3.org/TR/FileAPI/">the HTML5 File API</a> along with <a href="http://www.w3.org/TR/FileAPI/#normalization-of-params">file slicing</a>.
-      </div>
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+                <div class="flow-error">
+                    Your browser, unfortunately, is not supported by Flow.js. The library requires support for <a href="http://www.w3.org/TR/FileAPI/">the HTML5 File API</a> along with <a href="http://www.w3.org/TR/FileAPI/#normalization-of-params">file slicing</a>.
+                </div>
 
-      <div class="flow-drop" ondragenter="jQuery(this).addClass('flow-dragover');" ondragend="jQuery(this).removeClass('flow-dragover');" ondrop="jQuery(this).removeClass('flow-dragover');">
-        Drop files here to upload or <a class="flow-browse-folder"><u>select folder</u></a> or <a class="flow-browse"><u>select from your computer</u></a> or <a class="flow-browse-image"><u>select images</u></a>
-      </div>
+                <div class="flow-drop" ondragenter="jQuery(this).addClass('flow-dragover');" ondragend="jQuery(this).removeClass('flow-dragover');" ondrop="jQuery(this).removeClass('flow-dragover');">
+                    Drop files here to upload or <a class="flow-browse-folder"><u>select folder</u></a> or <a class="flow-browse"><u>select from your computer</u></a> or <a class="flow-browse-image"><u>select images</u></a>
+                </div>
 
-      <div class="flow-progress">
-        <table>
-          <tr>
-            <td width="100%"><div class="progress-container"><div class="progress-bar"></div></div></td>
-            <td class="progress-text" nowrap="nowrap"></td>
-            <td class="progress-pause" nowrap="nowrap">
-              <a href="#" onclick="r.upload(); return(false);" class="progress-resume-link"><img src="img/resume.png" title="Resume upload" /></a>
-              <a href="#" onclick="r.pause(); return(false);" class="progress-pause-link"><img src="img/pause.png" title="Pause upload" /></a>
-              <a href="#" onclick="r.cancel(); return(false);" class="progress-cancel-link"><img src="img/cancel.png" title="Cancel upload" /></a>
-            </td>
-          </tr>
-        </table>
-      </div>
+                <hr />
 
-      <div class="">
-        <button type="submit" onclick="sendRequest()">Invia Richiesta</button>
-      </div>
+                <div class="list-group flow-progress"></div>
+            </div>
+        </div>
 
-      <ul class="flow-list"></ul>
+        <hr />
+
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+
+                <button class="btn btn-primary" type="submit">Invia Richiesta</button>
+            </div>
+        </div>
+
     </div>
     <script src="js/jquery.min.js"></script>
+    <script src="js/jquery.loadTemplate.js"></script>
+    <script src="bootstrap/js/bootstrap.js"></script>
     <script src="js/flow.js"></script>
     <script src="js/app.js"></script>
-  </body>
+
+    <script type="text/html" id="template">
+        <div class="list-group-item" data-class="file">
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" aria-valuemax="100">
+                </div>
+            </div>
+
+            <p>
+                Uploading <span class="flow-file-name"></span>
+                <span class="flow-file-size"></span>
+                <span class="flow-file-progress"></span>
+                <a href="" class="flow-file-download" target="_blank"> Download </a>
+                <button type="button" class="btn btn-success flow-file-resume btn-sm progress-resume-link" onclick="r.upload(); return(false);" title="Resume upload">
+                    <span class="glyphicon glyphicon glyphicon-play" aria-hidden="true"></span>
+                </button>
+                <button type="button" class="btn btn-warning flow-file-pause btn-sm progress-pause-link" onclick="r.pause(); return(false);" title="Pause upload">
+                    <span class="glyphicon glyphicon glyphicon-pause" aria-hidden="true"></span>
+                </button>
+                <button type="button" class="btn btn-danger flow-file-cancel btn-sm progress-cancel-link" onclick="r.cancel(); return(false);" title="Cancel upload">
+                    <span class="glyphicon glyphicon glyphicon-remove-sign" aria-hidden="true"></span>
+                </button>
+                <!-- <a href="#" class="flow-file-resume"  class="progress-resume-link"><img src="img/resume.png" title="Resume upload" /></a>
+                <a href="#" class="flow-file-pause" onclick="r.pause(); return(false);" class="progress-pause-link"><img src="img/pause.png" title="Pause upload" /></a>
+                <a href="#" class="flow-file-cancel" onclick="r.cancel(); return(false);" class="progress-cancel-link"><img src="img/cancel.png" title="Cancel upload" /></a> -->
+            </p>
+        </div>
+    </script>
+
+    <script type="text/html" id="alert-template">
+        <div class="alert alert-warning alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span></button>
+            <strong>Warning!</strong> E' stato gia' eseguito l'upload per questo file.
+        </div>
+    </script>
+
+</body>
+
 </html>

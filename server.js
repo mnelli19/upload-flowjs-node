@@ -20,11 +20,13 @@ app.use(express.static(__dirname + '/public'));
 app.post('/prepare', (req, res) => {
     let body = req.body;
     request.insert(body, (err, body) => {
-        if (err) return res.status(err.code).json({message: err.msg}).end();
-
-        res.status(200).json({
-            message: body.msg
-        }).end();
+        if (err) {
+            res.status(err.code).json({message: err.msg}).end();
+        }else{
+            res.status(200).json({
+                message: body.msg
+            }).end();
+        }
     })
 });
 
@@ -32,9 +34,14 @@ app.post('/upload', upload.single('file'), (req, res) => {
     let file = req.file;
     let body = req.body;
 
+    console.log(body);
+
     flow.upload(file, body, (err, result) => {
-        if(err) res.status(500).end();
-        res.send();
+        if(err) {
+            res.status(500).end();
+        }else{
+            res.send();
+        }
     });
 });
 
@@ -43,11 +50,13 @@ app.put('/confirm', (req, res) => {
     let uniqueIdentifier = body.identifier;
     let user = body.user;
     request.confirm(uniqueIdentifier, user, (err, body) => {
-        if (err) return res.status(err.code).json({message: err.msg}).end();
-
-        res.status(200).json({
-            message: body.msg
-        }).end();
+        if (err) {
+            res.status(err.code).json({message: err.msg}).end();
+        }else{
+            res.status(200).json({
+                message: body.msg
+            }).end();
+        }
     })
 });
 
@@ -56,24 +65,27 @@ app.get('/download/:identifier/user/:user', function(req, res) {
     let user = req.params.user;
 
     request.getFromIdAndUser(identifier, user, (err, body) => {
-        if (err) res.status(err.code).json(err.msg).end();
+        if (err){
+            res.status(err.code).json(err.msg).end();
+        }else{
+            let filename = body.docs[0].name;
+            let size = body.docs[0].size;
+            flow.download(identifier, filename, size, user, (err, streams) => {
 
-        let filename = body.docs[0].name;
-        let size = body.docs[0].size;
-        flow.download(identifier, filename, size, (err, streams) => {
+                res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+                res.setHeader('Content-type', 'application/octet-stream');
 
-            res.setHeader('Content-disposition', 'attachment; filename=' + filename);
-            res.setHeader('Content-type', 'application/octet-stream');
+                let combinedStream = CombinedStream.create({
+                    maxDataSize: MAX_DATA_SIZE
+                });
 
-            let combinedStream = CombinedStream.create({
-                maxDataSize: MAX_DATA_SIZE
+                for (let stream of streams) {
+                    combinedStream.append(stream);
+                }
+                combinedStream.pipe(res);
             });
+        }
 
-            for (let stream of streams) {
-                combinedStream.append(stream);
-            }
-            combinedStream.pipe(res);
-        });
     })
 
 });
