@@ -17,6 +17,11 @@ const app = express();
 app.use(bodyParser.json());
 app.use(express.static(__dirname + '/public'));
 
+app.use(function(req, res) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+});
+
 app.post('/prepare', (req, res) => {
     let body = req.body;
     request.insert(body, (err, body) => {
