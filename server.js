@@ -2,6 +2,7 @@
 
 const express = require('express');
 const multer = require('multer');
+var agent = require('bluemix-autoscaling-agent');
 const CombinedStream = require('combined-stream');
 const bodyParser = require('body-parser');
 const flow = require('./lib/flowjs')();
